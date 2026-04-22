@@ -1,0 +1,222 @@
+MD5
+import java.security.*;
+import java.util.*;
+public class MD5Hash {
+    public static void main(String[] args) throws Exception {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter input1 string for MD5: ");
+        String input1 = sc.nextLine();
+        System.out.println("MD5 Hash for input1: " + hash(input1));
+        System.out.print("Enter input2 with small change in the string : ");
+        String input2 = sc.nextLine();
+        System.out.println("MD5 Hash for input2: " + hash(input2));
+        sc.close();
+    }
+    static String hash(String s) throws Exception {
+        byte[] b = MessageDigest.getInstance("MD5").digest(s.getBytes());
+        StringBuilder sb = new StringBuilder();
+        for (byte x : b) sb.append(String.format("%02x", x));
+        return sb.toString();
+    }
+}
+=============================
+SHA-1
+import java.security.*;
+import java.util.*;
+
+public class SHA1Hash {
+    public static void main(String[] args) throws Exception {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter first input string for SHA-1: ");
+        String input1 = sc.nextLine();
+        System.out.print("Enter second input string with a small change: ");
+        String input2 = sc.nextLine();
+
+        System.out.println("SHA-1 Hash of '" + input1 + "': " + hash(input1));
+        System.out.println("SHA-1 Hash of '" + input2 + "': " + hash(input2));
+
+        sc.close();
+    }
+
+    static String hash(String s) throws Exception {
+        byte[] b = MessageDigest.getInstance("SHA-1").digest(s.getBytes());
+        StringBuilder sb = new StringBuilder();
+        for (byte x : b) sb.append(String.format("%02x", x));
+        return sb.toString();
+    }
+}
+========================================
+Elgamel
+import java.math.BigInteger;
+import java.security.SecureRandom;
+import java.util.*;
+public class ElGamal {
+    static BigInteger p, g, x, y;
+    static SecureRandom r = new SecureRandom();
+    static {
+        p = BigInteger.probablePrime(512, r);
+        g = new BigInteger(511, r).mod(p);
+        x = new BigInteger(511, r).mod(p);
+        y = g.modPow(x, p);
+    }
+    static BigInteger[] encrypt(BigInteger m) {
+        BigInteger k = new BigInteger(511, r).mod(p);
+        return new BigInteger[]{g.modPow(k, p), m.multiply(y.modPow(k, p)).mod(p)};
+    }
+    static BigInteger decrypt(BigInteger[] c) {
+        BigInteger s = c[0].modPow(x, p);
+        return c[1].multiply(s.modInverse(p)).mod(p);
+    }
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Public Key: (p=" + p + ", g=" + g + ", y=" + y + ")");
+        System.out.println("Private Key: x=" + x);
+        System.out.print("Enter message to encrypt (numeric value): ");
+        BigInteger m = sc.nextBigInteger();
+        System.out.println("Original Message: " + m);
+        BigInteger[] c = encrypt(m);
+        System.out.println("Cipher Text: (" + c[0] + ", " + c[1] + ")");
+        System.out.println("Decrypted Message: " + decrypt(c));
+        sc.close();
+    }
+}
+
+
+week 9
+nmap
+Step 1: Installation 
+1.	Download from the official website: https://nmap.org/download.html
+2.	Install the EXE (it includes the command-line tool and Zenmap GUI)
+Step 2: Run the commands
+i) Basic Host Discovery (Check if host is up)
+            nmap -sn 10.1.2.213    //use your ip address in place of 10.1.2.213
+(to get your machine ip address in cmd type ipconfig)
+ii) Scan Multiple IPs or Subnet
+nmap -sn 10.1.2.213   /24
+iii) Port Scan of a Single Host
+              nmap 10.1.2.213    
+iv) Detect OS and Services
+           nmap -A 192.168.1.1
+v)  Scan for Specific Ports
+        nmap -p 22,80,443 192.168.1.1
+vi)  Scan for All Open Ports
+       nmap -p- 192.168.1.1
+v) Vulnerability Scan (using NSE scripts)
+     nmap --script vuln 192.168.1.1
+
+
+weeek 10
+gnupg
+STEPS TO DOWNLOAD AND INSTALL GPG4WIN (WITH KLEOPATRA)
+1. Visit the Official Website 
+    👉 https://www.gpg4win.org
+
+2. Click “Download Gpg4win”
+
+3. Run the Installer
+4. Select Components to Install
+The Gpg4win installer will offer several components. Make sure these are selected: 
+✅ GnuPG (core encryption engine)
+✅ Kleopatra (GUI key manager)
+
+5. Choose Installation Location
+Accept the default location or select a custom folder. 
+Click Install.
+
+Steps to Generate a GPG Key Pair in Kleopatra:
+1.	Launch Kleopatra application :
+2.	Go to the File menu → click “New Certificate.”
+3.	Choose Certificate Type-> by selecting Create a personal OpenPGP key pair and click Next.
+4.	Fill in your Name and Email Address (optional: add a comment).Click Next.
+5.	Review the Summary :Verify the entered details. If everything looks correct, click “Create Key.”
+6.	Set a Passphrase:  (at least 12 characters with a mix of upper/lowercase letters, numbers, and symbols)
+7.	Confirm the Passphrase
+8.	Backup Your Key Pair
+After successful creation, click on “Make a backup of your key pair” to save it.
+Choose a secure location, name the file, and click OK.
+9.	Completion: After exporting the backup, click OK to confirm.
+Back on the “Key Pair Successfully Created” screen, click Finish.
+10.	When prompted, click “Quit Kleopatra” to exit the program.
+
+
+week 11
+steganography
+Installing steghide
+For Windows:
+1. Download steghide for Windows:
+o Go to the official website or a trusted source like
+https://steghide.sourceforge.net/download.php and download the Windows version.
+2. Extract the files from the downloaded zip file and place them in a directory of your choice.
+3. Add steghide to your PATH (optional but useful for running the command globally):
+o Right-click on This PC and select Properties.
+o Click on Advanced system settings, then Environment Variables.
+o Under System Variables, find the Path variable, click Edit, and add the directory where
+steghide is located.
+4. Run steghide from Command Prompt:
+o Open Command Prompt and type steghide.
+o If the installation is successful, you should see a help message showing available
+commands.
+STEPS:
+Step 1: Prepare Your Files
+Get a JPEG image that will act as your cover file (e.g., cover.jpg).
+ Prepare the secret data that you want to hide (e.g., secret.txt).
+Step 2: Embed the Data into the Image
+Open your command-line interface (Terminal, Command Prompt, etc.).
+Use the following command to embed the secret file into the image:
+ steghide embed -cf cover.jpg -ef secret.txt
+o -cf specifies the cover file (the image you want to hide the data in).
+o -ef specifies the file to be embedded (the secret file).
+2. You will be prompted to enter a passphrase. This passphrase will protect the embedded data.
+Enter passphrase:
+Re-Enter passphrase:
+embedding "secret.txt" in "cover.jpg"... done
+3. After entering and confirming the passphrase, the data will be hidden in the image.
+Step 3: Check the Image
+1. Open the cover.jpg file.
+2. The image will look exactly the same as before and The secret data is invisible and securely
+embedded
+Step 4: Retrieve the Hidden Data
+1. To extract the hidden data, use the following command:
+ steghide extract -sf cover.jpg
+o -sf specifies the stego file (the image with hidden data).
+2. You will be prompted to enter the passphrase again.
+ Enter passphrase:
+wrote extracted data to "secret.txt"
+3. If the correct passphrase is entered, the tool will extract the hidden file (e.g., secret.txt).
+
+week 12
+wireshark
+1.	Go to the official website
+Visit: https://www.wireshark.org
+2.	Click on "Download"
+Choose the latest stable Windows installer (e.g., Wireshark-win64.exe for 64-bit).
+3.	Run the installer
+Double-click the downloaded .exe file to start the setup.
+4.	Follow the Setup Wizard
+o	Click Next through the steps.
+o	Choose components to install (default is fine for most users).
+5.	Install WinPcap or Npcap (important)
+o	You will be prompted to install Npcap (needed for packet capture).
+o	Choose to install it with default options.
+6.	Complete installation
+o	Click Install, wait for the setup to complete.
+o	Click Finish to launch Wireshark.
+7.	Launch Wireshark
+o	You can now open Wireshark from the Start menu or desktop shortcut.
+Steps to Apply Capture Filters in Wireshark
+________________________________________
+Step 1: Open Wireshark
+•	Launch Wireshark from your desktop or Start menu.
+Step 2: Select a Network Interface
+•	On the main screen, you'll see a list of available network interfaces (like Wi-Fi, Ethernet).
+•	Click on the interface you want to monitor.
+•	A text box labeled "Capture Filter" will appear under the interface list.
+________________________________________
+Step 3: Enter a Capture Filter
+Type a capture filter expression in the box to limit traffic. Here are some examples:
+Step 4: Start the Capture
+•	After typing the filter, click the Start Capture (blue shark fin icon) at the top.
+•	Only packets matching your filter will be shown and stored.
+✅ Step 5: Stop the Capture
+•	Click the red square (Stop) icon to stop capturing when you're done.
