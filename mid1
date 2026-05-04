@@ -1,0 +1,271 @@
+CEASER CIPHER
+import java.util.*;
+class Ceas {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter text: ");
+        String s = sc.nextLine();
+
+        System.out.print("Encrypted text: ");
+        for (char c : s.toCharArray()) {
+            if (c >= 'a' && c <= 'z')
+                c = (char) ((c - 'a' + 3) % 26 + 'a');
+            System.out.print(c);
+        }
+        sc.close();
+    }
+}
+--------------------------------------------------------
+SUBSTITUTE
+import java.util.*;
+class Substi {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        String a = "abcdefghijklmnopqrstuvwxyz";
+        String b = "qwertyuioplkjhgfdsazxcvbnm";
+
+        System.out.print("Enter text: ");
+        String s = sc.nextLine();
+
+        System.out.print("Cipher text: ");
+        for (char c : s.toCharArray())
+            System.out.print(b.charAt(a.indexOf(c)));
+
+        sc.close();
+    }
+}
+----------------------------------------------------------
+HILL CIPHER
+import java.util.*;
+class HillCipher {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter text: ");
+        String s = sc.nextLine();
+        int n = s.length();
+
+        int[] p = new int[n], c = new int[n];
+        int[][] k = new int[n][n];
+
+        for (int i = 0; i < n; i++)
+            p[i] = s.charAt(i) - 'A';
+
+        System.out.println("Enter key matrix:");
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
+                k[i][j] = sc.nextInt();
+
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
+                c[i] += k[i][j] * p[j];
+
+        System.out.print("Cipher text: ");
+        for (int i = 0; i < n; i++)
+            System.out.print((char) ('A' + c[i] % 26));
+
+        sc.close();
+    }
+}
+==================================================
+PLAYFAIR
+import java.util.*;
+
+class Play {
+    static char[][] m = new char[5][5];
+
+    static void keyMatrix(String key) {
+        key = key.replace("j", "i");
+        String s = "";
+
+        for (char c : key.toCharArray())
+            if (s.indexOf(c) == -1) s += c;
+
+        for (char c = 'a'; c <= 'z'; c++)
+            if (c != 'j' && s.indexOf(c) == -1) s += c;
+
+        int k = 0;
+        for (int i = 0; i < 5; i++)
+            for (int j = 0; j < 5; j++)
+                m[i][j] = s.charAt(k++);
+    }
+
+    static int[] find(char c) {
+        if (c == 'j') c = 'i';
+        for (int i = 0; i < 5; i++)
+            for (int j = 0; j < 5; j++)
+                if (m[i][j] == c)
+                    return new int[]{i, j};
+        return null;
+    }
+
+    static String encrypt(String pt) {
+        pt = pt.replace("j", "i");
+        String s = "";
+
+        for (int i = 0; i < pt.length(); i++) {
+            s += pt.charAt(i);
+            if (i < pt.length() - 1 && pt.charAt(i) == pt.charAt(i + 1))
+                s += "x";
+        }
+        if (s.length() % 2 != 0) s += "x";
+
+        System.out.println(s);
+
+        String ct = "";
+        for (int i = 0; i < s.length(); i += 2) {
+            int[] a = find(s.charAt(i));
+            int[] b = find(s.charAt(i + 1));
+
+            if (a[0] == b[0])
+                ct += "" + m[a[0]][(a[1] + 1) % 5] + m[b[0]][(b[1] + 1) % 5];
+            else if (a[1] == b[1])
+                ct += "" + m[(a[0] + 1) % 5][a[1]] + m[(b[0] + 1) % 5][b[1]];
+            else
+                ct += "" + m[a[0]][b[1]] + m[b[0]][a[1]];
+        }
+        return ct;
+    }
+
+    public static void main(String[] args) {
+        String key = "monarchy";
+        String pt = "instruments";
+
+        keyMatrix(key);
+
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 5; j++)
+                System.out.print(m[i][j] + " ");
+            System.out.println();
+        }
+
+        System.out.println();
+        System.out.println(encrypt(pt));
+        
+    }
+}
+===============================================
+DES
+import javax.crypto.*;
+import java.util.Base64;
+
+class DES {
+    public static void main(String[] args) throws Exception {
+
+        KeyGenerator kg = KeyGenerator.getInstance("DES");
+        SecretKey k = kg.generateKey();
+
+        Cipher c = Cipher.getInstance("DES");
+
+        String pt = "Hello";
+        System.out.println("Plain Text: " + pt);
+
+        c.init(Cipher.ENCRYPT_MODE, k);
+        String et = Base64.getEncoder()
+                .encodeToString(c.doFinal(pt.getBytes()));
+        System.out.println("Encrypted: " + et);
+
+        c.init(Cipher.DECRYPT_MODE, k);
+        String dt = new String(c.doFinal(
+                Base64.getDecoder().decode(et)));
+        System.out.println("Decrypted: " + dt);
+    }
+}
+====================================================
+RSA
+import java.security.*;
+import javax.crypto.Cipher;
+import java.util.*;
+import java.util.Base64;
+
+class RSA {
+    public static void main(String[] args) throws Exception {
+
+        Scanner sc=new Scanner(System.in);
+        System.out.print("Enter plaintext: ");
+        String pt=sc.nextLine();
+
+        KeyPairGenerator kpg=KeyPairGenerator.getInstance("RSA");
+        kpg.initialize(512);
+        KeyPair kp=kpg.generateKeyPair();
+
+        Cipher c=Cipher.getInstance("RSA");
+
+        c.init(Cipher.ENCRYPT_MODE,kp.getPublic());
+        String et=Base64.getEncoder()
+                .encodeToString(c.doFinal(pt.getBytes()));
+        System.out.println("Encrypted: "+et);
+
+        c.init(Cipher.DECRYPT_MODE,kp.getPrivate());
+        System.out.println("Decrypted: "+
+            new String(c.doFinal(Base64.getDecoder().decode(et))));
+        sc.close();
+    }
+}
+==================================================
+DiffieHellman
+import java.math.BigInteger;
+import java.util.Scanner;
+
+class DiffieHellman {
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter a prime number (p): ");
+        BigInteger p = sc.nextBigInteger();
+
+        System.out.print("Enter a primitive root modulo p (g): ");
+        BigInteger g = sc.nextBigInteger();
+
+        BigInteger a = new BigInteger("6");    // Alice private key
+        BigInteger b = new BigInteger("15");   // Bob private key
+
+        BigInteger A = g.modPow(a, p);
+        BigInteger B = g.modPow(b, p);
+
+        System.out.println("Alice's Public Key (A): " + A);
+        System.out.println("Bob's Public Key (B): " + B);
+
+        BigInteger k1 = B.modPow(a, p);
+        BigInteger k2 = A.modPow(b, p);
+
+        System.out.println("Alice's Secret Key: " + k1);
+        System.out.println("Bob's Secret Key: " + k2);
+
+        System.out.println("Key exchange successful. Shared secret key is established.");
+
+        sc.close();
+    }
+}
+=======================================================
+HMAC
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.util.*;
+import java.util.Base64;
+
+class HMAC {
+    public static void main(String[] args) throws Exception {
+
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter the message: ");
+        String msg = sc.nextLine();
+
+        System.out.print("Enter the secret key: ");
+        String key = sc.nextLine();
+
+        Mac mac = Mac.getInstance("HmacSHA256");
+        SecretKeySpec sk = new SecretKeySpec(key.getBytes(), "HmacSHA256");
+        mac.init(sk);
+
+        String res = Base64.getEncoder()
+                .encodeToString(mac.doFinal(msg.getBytes()));
+
+        System.out.println("Message: " + msg);
+        System.out.println("MAC (HMAC-SHA256): " + res);
+
+        sc.close();
+    }
+}
