@@ -1,0 +1,71 @@
+import java.util.Scanner;
+public class RailFence{
+    static String encrypt(String text, int key) {
+        String[] rail = new String[key];
+        for (int i = 0; i < key; i++)
+            rail[i] = "";
+        int row = 0;
+        boolean down = true;
+        for (int i = 0; i < text.length(); i++) {
+            rail[row] += text.charAt(i);
+            if (row == 0) down = true;
+            else if (row == key - 1) down = false;
+            row = down ? row + 1 : row - 1;
+        }
+        String result = "";
+        for (int i = 0; i < key; i++)
+            result += rail[i];
+        return result;
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter text: ");
+        String text = sc.nextLine();
+        System.out.print("Enter key: ");
+        int key = sc.nextInt();
+        System.out.println("Encrypted: " + encrypt(text, key));
+        sc.close();
+    }
+}
+
+
+
+
+
+import java.util.Scanner;
+public class CRT {
+    static int modInverse(int a, int m) {
+        a = a % m;
+        for (int x = 1; x < m; x++)
+            if ((a * x) % m == 1)
+                return x;
+        return 1;
+    }
+    static int findX(int[] num, int[] rem, int n) {
+        int prod = 1;
+        for (int i = 0; i < n; i++)
+            prod *= num[i];
+        int result = 0;
+        for (int i = 0; i < n; i++) {
+            int pp = prod / num[i];
+            result += rem[i] * modInverse(pp, num[i]) * pp;
+        }
+        return result % prod;
+    }
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter number of equations: ");
+        int n = sc.nextInt();
+        int[] num = new int[n];
+        int[] rem = new int[n];
+        System.out.println("Enter moduli:");
+        for (int i = 0; i < n; i++)
+            num[i] = sc.nextInt();
+        System.out.println("Enter remainders:");
+        for (int i = 0; i < n; i++)
+            rem[i] = sc.nextInt();
+        System.out.println("x = " + findX(num, rem, n));
+        sc.close();
+    }
+}
